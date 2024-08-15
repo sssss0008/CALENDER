@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Calendar with Clock</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: #f0f4f8;
+        }
+
+        .calendar {
+            width: 320px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #3f51b5;
+            color: white;
+            padding: 10px;
+        }
+
+        .header button {
+            background: #283593;
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .header button:hover {
+            background: #1a237e;
+        }
+
+        .month-year {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .weekdays {
+            display: flex;
+            background: #eee;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+            color: #666;
+        }
+
+        .weekdays div {
+            width: 14.28%;
+        }
+
+        .days {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px;
+            background: #fff;
+        }
+
+        .days div {
+            width: 14.28%;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+            animation: zoomIn 0.3s ease;
+        }
+
+        .days div:hover {
+            background: #c5cae9;
+            transition: background 0.3s ease;
+        }
+
+        .days .today {
+            background: #7986cb;
+            color: white;
+            border-radius: 50%;
+        }
+
+        .clock {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 18px;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="calendar">
+        <div class="header">
+            <button id="prevMonth">&lt;</button>
+            <div class="month-year" id="monthYear"></div>
+            <button id="nextMonth">&gt;</button>
+        </div>
+        <div class="clock" id="clock"></div>
+        <div class="weekdays">
+            <div>Sun</div>
+            <div>Mon</div>
+            <div>Tue</div>
+            <div>Wed</div>
+            <div>Thu</div>
+            <div>Fri</div>
+            <div>Sat</div>
+        </div>
+        <div class="days" id="calendarDays"></div>
+    </div>
+
+    <script>
+        const calendarDays = document.getElementById('calendarDays');
+        const monthYear = document.getElementById('monthYear');
+        const prevMonth = document.getElementById('prevMonth');
+        const nextMonth = document.getElementById('nextMonth');
+        const clockElement = document.getElementById('clock');
+
+        let currentMonth = new Date().getMonth();
+        let currentYear = new Date().getFullYear();
+
+        const months = [
+            "January", "February", "March", "April", "May", "June", 
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        function renderCalendar() {
+            calendarDays.innerHTML = '';
+            const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+            monthYear.textContent = `${months[currentMonth]} ${currentYear}`;
+
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                calendarDays.innerHTML += `<div></div>`;
+            }
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const today = new Date().getDate();
+                const isToday = currentYear === new Date().getFullYear() &&
+                                currentMonth === new Date().getMonth() &&
+                                i === today;
+                calendarDays.innerHTML += `<div class="${isToday ? 'today' : ''}">${i}</div>`;
+            }
+        }
+
+        prevMonth.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+
+        nextMonth.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            clockElement.textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateClock, 1000);
+
+        renderCalendar();
+        updateClock(); // Initialize the clock immediately
+    </script>
+</body>
+</html>
